@@ -150,7 +150,7 @@ const Room = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-neo-white text-neo-black font-body overflow-hidden">
+        <div className="h-[100dvh] flex flex-col bg-neo-white text-neo-black font-body overflow-hidden">
             
             {/* Header */}
             <header className="flex-none p-4 flex items-center justify-between border-b-4 border-black bg-white z-10 shadow-sm">

@@ -20,12 +20,12 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neo-white text-neo-black font-body overflow-hidden relative">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-20 left-10 w-16 h-16 bg-neo-yellow border-4 border-black rounded-full animate-float opacity-80 z-0"></div>
-      <div className="absolute bottom-40 right-20 w-24 h-24 bg-neo-blue border-4 border-black rotate-12 animate-wiggle z-0"></div>
+    <div className="min-h-screen bg-neo-white text-neo-black font-body overflow-x-hidden relative">
+      {/* Decorative Background Elements - Hidden on mobile to reduce clutter */}
+      <div className="hidden md:block absolute top-20 left-10 w-16 h-16 bg-neo-yellow border-4 border-black rounded-full animate-float opacity-80 z-0"></div>
+      <div className="hidden md:block absolute bottom-40 right-20 w-24 h-24 bg-neo-blue border-4 border-black rotate-12 animate-wiggle z-0"></div>
       
-      <div className="container mx-auto px-4 h-screen flex flex-col items-center justify-center relative z-10">
+      <div className="container mx-auto px-4 py-12 min-h-screen flex flex-col items-center justify-center relative z-10">
         
         {/* Main Title */}
         <motion.div 
@@ -38,11 +38,11 @@ const Home = () => {
           <img 
             src="/character.png" 
             alt="Mascot"
-            className="absolute -top-20 left-1/2 -translate-x-1/2 w-28 object-contain -z-20 animate-peek"
+            className="absolute -top-16 md:-top-20 left-1/2 -translate-x-1/2 w-20 md:w-28 object-contain -z-20 animate-peek"
           />
 
           <div className="inline-block relative">
-            <h1 className="text-6xl md:text-8xl font-display uppercase tracking-widest relative z-10">
+            <h1 className="text-5xl md:text-8xl font-display uppercase tracking-widest relative z-10">
               DeadDrop
             </h1>
             <div className="absolute -bottom-2 -right-2 w-full h-full bg-neo-green -z-10"></div>
