@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, ArrowRight, Upload, Zap } from 'lucide-react';
+import { Box, ArrowRight, Upload, Zap, Github, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Home = () => {
@@ -32,8 +32,15 @@ const Home = () => {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300 }}
-          className="text-center mb-12"
+          className="text-center mb-12 relative"
         >
+          {/* Mascot Peeking */}
+          <img 
+            src="/character.png" 
+            alt="Mascot"
+            className="absolute -top-20 left-1/2 -translate-x-1/2 w-28 object-contain -z-20 animate-peek"
+          />
+
           <div className="inline-block relative">
             <h1 className="text-6xl md:text-8xl font-display uppercase tracking-widest relative z-10">
               DeadDrop
@@ -119,10 +126,30 @@ const Home = () => {
         </div>
 
         {/* Footer Warning */}
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center space-y-8">
           <p className="font-mono text-xs bg-red-500 text-white inline-block px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            WARNING: DATA SELF-DESTRUCTS IN 24H
+            WARNING: DATA SELF-DESTRUCTS AFTER 2H INACTIVITY
           </p>
+
+          {/* Credits Footer */}
+          <div className="flex flex-col items-center gap-4 font-display uppercase tracking-widest text-sm">
+            <p>
+              Made by <span className="text-neo-pink">Ankush Samanta</span>
+            </p>
+            <a 
+              href="https://github.com/MrFantastico007/DeadDrop" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center gap-3 bg-neo-white border-2 border-black px-6 py-3 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-0 active:shadow-none bg-neo-yellow/20 hover:bg-neo-yellow"
+            >
+              <Github size={20} />
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[10px] font-bold">Open Source</span>
+                <span className="font-bold">Star on GitHub</span>
+              </div>
+              <Star size={20} className="fill-black group-hover:rotate-180 transition-transform duration-500" />
+            </a>
+          </div>
         </div>
 
       </div>

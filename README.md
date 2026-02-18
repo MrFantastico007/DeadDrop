@@ -17,7 +17,7 @@
 
 * **⚡ Real-Time Sync:** Powered by **Socket.io**, transfers happen instantly. No page refreshes required.
 * **🔒 Zero Auth:** No accounts, no emails. Just create a Room Code and share it.
-* **⏳ 24-Hour Self-Destruct:** An automated cleanup cron job ensures privacy by wiping all data (Database entries + Cloudinary files) after 24 hours.
+* **⏳ 2-Hour Inactivity Self-Destruct:** An automated cleanup cron job ensures privacy by wiping all data (Database entries + Cloudinary files) after a room has been inactive for 2 hours.
 * **📂 Universal Sharing:** Supports text snippets (with one-click copy) and file uploads (images, PDFs, zips, etc.).
 * **🌑 Dark Mode UI:** A sleek, minimal interface designed for speed.
 
@@ -48,7 +48,7 @@ Built with the **MERN** stack, optimized for free-tier deployment.
 
 1.  **Clone the repo**
     ```bash
-    git clone [https://github.com/yourusername/live-drop.git](https://github.com/yourusername/live-drop.git)
+    git clone https://github.com/yourusername/live-drop.git
     cd live-drop
     ```
 
@@ -85,7 +85,7 @@ Built with the **MERN** stack, optimized for free-tier deployment.
 To ensure the free tier of Cloudinary doesn't fill up, this project uses a specific architecture for deletion:
 
 1.  **MongoDB** stores the file metadata and a `createdAt` timestamp.
-2.  A dedicated API route `/api/cleanup` checks for items older than 24 hours.
+2.  A dedicated API route `/api/cleanup` checks for rooms with no activity for > 2 hours.
 3.  It first calls the **Cloudinary API** to destroy the raw file.
 4.  Then, it deletes the **MongoDB** document.
 5.  (Production) An external Cron Job pings this route every hour.
