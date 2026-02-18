@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;800&family=Outfit:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-neo-white: #ffffff;
+  --color-neo-off-white: #f8fafc;
+  --color-neo-black: #000000;
+  --color-neo-blue: #00f0ff;
+  --color-neo-pink: #ff0099;
+  --color-neo-yellow: #ffde00;
+  --color-neo-green: #32cd32;
+  
+  --font-display: "Archivo Black", sans-serif;
+  --font-body: "Inter", sans-serif;
+  
+  --shadow-neo: 4px 4px 0px 0px #000000;
+  --shadow-neo-sm: 2px 2px 0px 0px #000000;
+  --shadow-neo-lg: 8px 8px 0px 0px #000000;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+}
+
+:root {
+  background-color: var(--color-neo-white);
+  color: var(--color-neo-black);
+  font-family: var(--font-body);
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-neo-white);
+  border-left: 2px solid var(--color-neo-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-neo-black);
+  border: 2px solid var(--color-neo-white);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neo-pink);
+}
+
+/* Utilities */
+.neo-border {
+  border: 3px solid var(--color-neo-black);
+}
+
+.neo-shadow {
+  box-shadow: var(--shadow-neo);
+}
+
+.neo-btn {
+  @apply border-2 border-black bg-white px-6 py-3 font-bold uppercase tracking-wider transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none;
+}
+
+.neo-input {
+  @apply w-full border-2 border-black p-4 font-bold outline-none transition-all focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+}
+
+.neo-card {
+  @apply border-2 border-black bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+}
