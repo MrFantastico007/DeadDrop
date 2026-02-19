@@ -1,7 +1,7 @@
 # ⚡ Dead Drop
 
 > **Real-time. Ephemeral. Secure.**
-> Share files and text across devices instantly. Everything self-destructs in 24 hours.
+> Share files and text across devices instantly. Everything self-destructs after 2 hours of inactivity.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Stack](https://img.shields.io/badge/stack-MERN-green.svg)
