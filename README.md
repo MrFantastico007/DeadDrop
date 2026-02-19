@@ -12,7 +12,7 @@
 
 **Live Drop** is a lightweight, browser-based dead drop for digital content. It solves the problem of quickly moving a file or a snippet of text from Phone A to Laptop B (or to a friend) without logging in, emailing yourself, or using permanent cloud storage.
 
-**The catch?** It’s ephemeral. Every room and every byte of data is automatically purged from existence exactly 24 hours after creation.
+**The catch?** It’s ephemeral. Every room and every byte of data is automatically purged from existence exactly 2 hours after creation.
 
 ## ✨ Key Features
 
