@@ -6,6 +6,8 @@
 ![Stack](https://img.shields.io/badge/stack-MERN-green.svg)
 ![Status](https://img.shields.io/badge/status-Active-brightgreen.svg)
 
+## 🌐 Live Demo 
+👉 https://deaddropexe.vercel.app/
 ## 📖 About
 
 **Live Drop** is a lightweight, browser-based dead drop for digital content. It solves the problem of quickly moving a file or a snippet of text from Phone A to Laptop B (or to a friend) without logging in, emailing yourself, or using permanent cloud storage.
