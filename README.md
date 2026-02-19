@@ -1,4 +1,4 @@
-# ⚡ Live Drop
+# ⚡ Dead Drop
 
 > **Real-time. Ephemeral. Secure.**
 > Share files and text across devices instantly. Everything self-destructs in 24 hours.
