@@ -3,7 +3,6 @@
 > **Real-time. Ephemeral. Secure.**
 > Share files and text across devices instantly. Everything self-destructs after 2 hours of inactivity.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Stack](https://img.shields.io/badge/stack-MERN-green.svg)
 ![Status](https://img.shields.io/badge/status-Active-brightgreen.svg)
 
@@ -102,10 +101,6 @@ Contributions are welcome!
 4.  Push to the Branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
 
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
 ---
 
-**Built with 🖤 by [Ankush]**
+**Built with 🖤 by Ankush**
