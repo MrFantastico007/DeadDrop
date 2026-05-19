@@ -264,20 +264,17 @@ const Room = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4 ml-auto">
+                <div className="flex items-center gap-2 sm:gap-4 ml-auto shrink-0">
                     <div 
                         onClick={copyRoomCode}
-                        className="cursor-pointer border border-chamber-gold/30 bg-chamber-black/50 px-4 py-2 flex items-center gap-3 hover:bg-chamber-gold/10 hover:border-chamber-gold transition-all group"
+                        className="cursor-pointer border border-chamber-gold/30 bg-chamber-black/50 px-2 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3 hover:bg-chamber-gold/10 hover:border-chamber-gold transition-all group shrink-0"
                     >
-                        <span className="font-mono tracking-[0.2em] text-sm md:text-base text-chamber-gold">{roomCode}</span>
-                        {copiedId === 'room-code' ? <Check size={16} className="text-chamber-glow" /> : <Copy size={16} className="text-chamber-gold/50 group-hover:text-chamber-gold" />}
+                        <span className="font-mono tracking-[0.2em] text-xs sm:text-sm md:text-base text-chamber-gold">{roomCode}</span>
+                        {copiedId === 'room-code' ? <Check size={14} className="text-chamber-glow" /> : <Copy size={14} className="text-chamber-gold/50 group-hover:text-chamber-gold" />}
                     </div>
-                    <div className="flex items-center gap-2 border border-dashed border-gray-600 px-2 sm:px-3 py-1 bg-chamber-black/50 overflow-hidden max-w-[120px] sm:max-w-none">
+                    <div className="flex items-center gap-1 sm:gap-2 border border-dashed border-gray-600 px-2 sm:px-3 py-1.5 bg-chamber-black/50 shrink-0">
                         <span className="text-[8px] font-mono text-gray-500 uppercase tracking-widest leading-none hidden sm:block">ID</span>
-                        <span className="font-mono text-[10px] sm:text-xs text-gray-300 truncate">
-                            <span className="hidden sm:inline">{deviceId}</span>
-                            <span className="sm:hidden">{deviceId.substring(0, 11)}...</span>
-                        </span>
+                        <span className="font-mono text-[10px] sm:text-xs text-gray-300">{deviceId}</span>
                     </div>
                 </div>
             </header>
