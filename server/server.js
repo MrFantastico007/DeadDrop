@@ -3,6 +3,10 @@ const dns = require('dns');
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 require('dotenv').config();
+
+// Global Admin Code (use env var or generate one for this session)
+global.SERVER_ADMIN_CODE = process.env.ADMIN_CODE || Math.floor(100000 + Math.random() * 900000).toString();
+
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
@@ -37,4 +41,7 @@ socketUtils.init(server);
 app.use('/api', apiRoutes);
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🛡️  [ADMIN KEY]   ${global.SERVER_ADMIN_CODE}`);
+});
