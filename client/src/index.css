@@ -52,7 +52,6 @@
 }
 
 @layer utilities {
-@layer utilities {
   /* High-Tech Glowing Dot Matrix Pattern */
   .chamber-dot-matrix {
     background-image: radial-gradient(rgba(212, 175, 55, 0.4) 1px, transparent 1px);
@@ -136,7 +135,9 @@
   .tactical-btn:active {
     color: #0B0B0F;
   }
-}:root {
+}
+
+:root {
   background-color: var(--color-chamber-black);
   color: var(--color-chamber-white);
   font-family: var(--font-body);
