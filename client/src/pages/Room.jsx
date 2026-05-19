@@ -245,6 +245,12 @@ const Room = () => {
             
             {/* Tactical Animated Background */}
             <div className="absolute inset-0 z-0 bg-chamber-black overflow-hidden pointer-events-none">
+                {/* Wavy Pattern Background */}
+                <div 
+                    className="absolute inset-0 opacity-20 mix-blend-screen animate-bg-pan"
+                    style={{ backgroundImage: "url('/chamber3.webp')" }}
+                ></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/90 via-chamber-black/60 to-chamber-black/90"></div>
                 <div className="absolute inset-0 bg-tactical-grid opacity-10"></div>
                 
                 {/* Animated Laser/Tracer Lines */}
@@ -476,7 +482,7 @@ const Room = () => {
                                 </div>
 
                                 {/* Message Actions */}
-                                <div className="flex md:flex-col gap-2 ml-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0">
+                                <div className="flex md:flex-col gap-2 ml-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0 self-start">
                                     <button 
                                         onClick={() => handleCopy(msg.type === 'text' ? msg.content : msg.fileUrl, msg._id)}
                                         className="p-2 border border-chamber-white/20 text-gray-400 hover:text-chamber-gold hover:border-chamber-gold transition-colors bg-chamber-navy/50"
