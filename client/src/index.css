@@ -43,6 +43,17 @@
     0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-color: rgba(212, 175, 55, 0.8); }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 0; border-color: rgba(212, 175, 55, 0); }
   }
+
+  @keyframes bgPan {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+  }
+
+  .animate-bg-pan {
+    animation: bgPan 20s ease-in-out infinite;
+    background-size: 150% 150%;
+  }
 }
 
 :root {
