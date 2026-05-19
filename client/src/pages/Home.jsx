@@ -25,19 +25,20 @@ const Home = () => {
       <div className="fixed inset-0 z-0 bg-chamber-black overflow-hidden">
         {/* Base Character Image */}
         <div 
-            className="absolute inset-0 bg-cover bg-center opacity-50"
+            className="absolute inset-0 bg-cover bg-center opacity-70"
             style={{ backgroundImage: "url('/chamber4.webp')" }}
         ></div>
-        {/* Darkening Overlay */}
-        <div className="absolute inset-0 bg-chamber-black/70 mix-blend-multiply"></div>
+        
+        {/* Darkening Gradient for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/95 via-chamber-black/60 to-chamber-black/95"></div>
 
         {/* Wavy Pattern Background */}
         <div 
-            className="absolute inset-0 opacity-30 mix-blend-screen animate-bg-pan"
+            className="absolute inset-0 opacity-40 mix-blend-screen animate-bg-pan"
             style={{ backgroundImage: "url('/chamber3.webp')" }}
         ></div>
         
-        <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/90 via-chamber-black/50 to-chamber-black/90"></div>
+        {/* Tactical Grid */}
         <div className="absolute inset-0 bg-tactical-grid opacity-20"></div>
         
         {/* Animated Laser/Tracer Lines */}
