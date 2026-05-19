@@ -32,8 +32,8 @@ const Home = () => {
         {/* Darkening Gradient for Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/95 via-chamber-black/60 to-chamber-black/95"></div>
 
-        {/* Chamber Geometric Pattern Animation */}
-        <div className="absolute inset-0 chamber-pattern opacity-40"></div>
+        {/* Cinematic Gold Ambient Lighting */}
+        <div className="absolute inset-0 chamber-ambient"></div>
         
         {/* Tactical Grid Overlay */}
         <div className="absolute inset-0 bg-tactical-grid opacity-10"></div>
