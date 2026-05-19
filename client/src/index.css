@@ -52,12 +52,29 @@
 }
 
 @layer utilities {
-  .animate-bg-pan {
-    animation: bgPan 20s ease-in-out infinite;
-    background-size: 150% 150%;
+  .chamber-pattern {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(212, 175, 55, 0.05) 0,
+      rgba(212, 175, 55, 0.05) 2px,
+      transparent 2px,
+      transparent 30px
+    ), repeating-linear-gradient(
+      -45deg,
+      rgba(212, 175, 55, 0.05) 0,
+      rgba(212, 175, 55, 0.05) 2px,
+      transparent 2px,
+      transparent 30px
+    );
+    background-size: 60px 60px;
+    animation: patternScroll 20s linear infinite;
   }
-}
-:root {
+
+  @keyframes patternScroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+}:root {
   background-color: var(--color-chamber-black);
   color: var(--color-chamber-white);
   font-family: var(--font-body);

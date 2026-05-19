@@ -245,21 +245,13 @@ const Room = () => {
             
             {/* Tactical Animated Background */}
             <div className="absolute inset-0 z-0 bg-chamber-black overflow-hidden pointer-events-none">
-                {/* Wavy Pattern Background */}
-                <div 
-                    className="absolute inset-0 opacity-20 mix-blend-screen animate-bg-pan"
-                    style={{ backgroundImage: "url('/chamber3.webp')" }}
-                ></div>
                 <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/90 via-chamber-black/60 to-chamber-black/90"></div>
+                
+                {/* Chamber Geometric Pattern Animation */}
+                <div className="absolute inset-0 chamber-pattern opacity-30"></div>
+                
+                {/* Tactical Grid Overlay */}
                 <div className="absolute inset-0 bg-tactical-grid opacity-10"></div>
-                
-                {/* Animated Laser/Tracer Lines */}
-                <div className="absolute top-1/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-chamber-gold to-transparent opacity-30 animate-trace-x"></div>
-                <div className="absolute bottom-1/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-chamber-glow to-transparent opacity-20 animate-trace-x-delayed"></div>
-                <div className="absolute left-1/3 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-chamber-gold to-transparent opacity-20 animate-trace-y"></div>
-                
-                {/* Tactical Scanning Lines */}
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-20 mix-blend-overlay"></div>
             </div>
 
             {/* Header */}
