@@ -28,5 +28,9 @@ const permissionSchema = new mongoose.Schema({
     default: []
   }
 });
+const Permission = mongoose.model('Permission', permissionSchema);
 
-module.exports = mongoose.model('Permission', permissionSchema);
+// Safely drop the legacy unique index if it exists so it doesn't block new per-room documents
+Permission.collection.dropIndex('singleton_1').catch(() => {});
+
+module.exports = Permission;
