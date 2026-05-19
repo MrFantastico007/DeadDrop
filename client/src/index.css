@@ -18,44 +18,45 @@
   --animate-trace-y: traceY 5s cubic-bezier(0.8, 0, 0.2, 1) infinite 0.5s;
   --animate-trace-y-delayed: traceY 6s cubic-bezier(0.8, 0, 0.2, 1) infinite 2s;
   --animate-tp-pulse: tpPulse 3s ease-out infinite;
+}
 
-  @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 5px 0px rgba(212, 175, 55, 0.2); }
-    50% { box-shadow: 0 0 20px 2px rgba(255, 214, 107, 0.5); }
-  }
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 5px 0px rgba(212, 175, 55, 0.2); }
+  50% { box-shadow: 0 0 20px 2px rgba(255, 214, 107, 0.5); }
+}
 
-  @keyframes scan {
-    0% { background-position: 0% -100%; }
-    100% { background-position: 0% 200%; }
-  }
+@keyframes scan {
+  0% { background-position: 0% -100%; }
+  100% { background-position: 0% 200%; }
+}
 
-  @keyframes traceX {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
+@keyframes traceX {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
 
-  @keyframes traceY {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
-  }
+@keyframes traceY {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
 
-  @keyframes tpPulse {
-    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-color: rgba(212, 175, 55, 0.8); }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; border-color: rgba(212, 175, 55, 0); }
-  }
+@keyframes tpPulse {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-color: rgba(212, 175, 55, 0.8); }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; border-color: rgba(212, 175, 55, 0); }
+}
 
-  @keyframes bgPan {
-    0% { background-position: 0% 0%; }
-    50% { background-position: 100% 100%; }
-    100% { background-position: 0% 0%; }
-  }
+@keyframes bgPan {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
 
+@layer utilities {
   .animate-bg-pan {
     animation: bgPan 20s ease-in-out infinite;
     background-size: 150% 150%;
   }
 }
-
 :root {
   background-color: var(--color-chamber-black);
   color: var(--color-chamber-white);
