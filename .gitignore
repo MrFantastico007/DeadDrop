@@ -6,3 +6,4 @@ build/
 *.log
 server_debug_run.log
 check_env.js
+uploads/
