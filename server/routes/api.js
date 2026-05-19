@@ -4,6 +4,24 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const Message = require('../models/Message');
+const Permission = require('../models/Permission');
+
+async function getPermissions() {
+    let perm = await Permission.findOne({ singleton: 'GLOBAL' });
+    if (!perm) {
+        perm = await Permission.create({ singleton: 'GLOBAL' });
+    }
+    return perm;
+}
+
+function getRoleForDevice(perm, deviceId) {
+    if (!deviceId) return 'viewer';
+    if (perm.blocked.includes(deviceId)) return 'blocked';
+    if (perm.admins.includes(deviceId)) return 'admin';
+    if (perm.editors.includes(deviceId)) return 'editor';
+    if (perm.conversers.includes(deviceId)) return 'converser';
+    return 'viewer';
+}
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, '../uploads');
