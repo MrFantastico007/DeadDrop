@@ -89,8 +89,15 @@ router.post('/upload', (req, res, next) => {
 
 // Save a new message (text or file) to the database
 router.post('/message', async (req, res) => {
-    const { roomCode, type, content, fileUrl, publicId } = req.body;
+    const { roomCode, type, content, fileUrl, publicId, deviceId } = req.body;
+    
     try {
+        const perm = await getPermissions();
+        const role = getRoleForDevice(perm, deviceId);
+        
+        if (role === 'blocked') return res.status(403).json({ error: 'Blocked' });
+        if (role === 'viewer') return res.status(403).json({ error: 'Viewers cannot send messages' });
+
         const newMessage = new Message({
             roomCode,
             type,
