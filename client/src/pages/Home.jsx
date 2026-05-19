@@ -23,9 +23,17 @@ const Home = () => {
     <div className="min-h-screen bg-chamber-black text-chamber-white font-body overflow-x-hidden relative flex flex-col">
       {/* Tactical Animated Background */}
       <div className="fixed inset-0 z-0 bg-chamber-black overflow-hidden">
+        {/* Base Character Image */}
+        <div 
+            className="absolute inset-0 bg-cover bg-center opacity-50"
+            style={{ backgroundImage: "url('/chamber4.webp')" }}
+        ></div>
+        {/* Darkening Overlay */}
+        <div className="absolute inset-0 bg-chamber-black/70 mix-blend-multiply"></div>
+
         {/* Wavy Pattern Background */}
         <div 
-            className="absolute inset-0 opacity-40 mix-blend-screen animate-bg-pan"
+            className="absolute inset-0 opacity-30 mix-blend-screen animate-bg-pan"
             style={{ backgroundImage: "url('/chamber3.webp')" }}
         ></div>
         
