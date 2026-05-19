@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { ArrowLeft, Send, Paperclip, Copy, Trash2, FileText, Download, Check, WifiOff, Shield, X, ShieldAlert, UserCheck, UserX, Eye, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Send, Paperclip, Copy, Trash2, FileText, Download, Check, WifiOff, Shield, X, ShieldAlert, UserCheck, UserX, Eye, MessageSquare, Crosshair } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Use environment variable for production, fallback to localhost for dev
@@ -174,12 +174,12 @@ const Room = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Delete this message/file permanently?")) return;
+        if (!window.confirm("Purge this data permanently?")) return;
         try {
             await axios.delete(`${ENDPOINT}/api/message/${id}`, { headers: { deviceid: deviceId } });
         } catch (err) {
             console.error("Delete failed", err);
-            alert("Delete failed. You might not have permission.");
+            alert("Delete failed. Insufficient privileges.");
         }
     };
 
@@ -208,7 +208,7 @@ const Room = () => {
                 if (blockedRes.data.success) setBlockedUsers(blockedRes.data.success.blocked || blockedRes.data.blocked);
             }
         } catch (err) {
-            alert('Invalid Admin Code');
+            alert('Invalid Authorization Code');
         }
     };
 
@@ -223,48 +223,71 @@ const Room = () => {
 
     if (userRole === 'blocked') {
         return (
-            <div className="h-[100dvh] flex items-center justify-center bg-neo-pink text-neo-black font-body">
-                <div className="neo-card text-center space-y-4 max-w-sm mx-auto">
-                    <ShieldAlert size={64} className="mx-auto" />
-                    <h1 className="text-3xl font-display uppercase tracking-wider">Access Denied</h1>
-                    <p className="font-bold">You have been blocked from dropping files by the host.</p>
-                </div>
+            <div className="min-h-screen bg-chamber-black text-chamber-white font-body overflow-x-hidden relative flex flex-col justify-center items-center">
+                <div className="absolute inset-0 bg-tactical-grid opacity-20 z-0"></div>
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass-panel p-12 text-center max-w-md relative z-10 border-red-500/50"
+                >
+                    <ShieldAlert size={64} className="mx-auto text-red-500 mb-6" />
+                    <h1 className="text-3xl font-display uppercase tracking-[0.2em] mb-4 text-red-500 holographic-text">Access Denied</h1>
+                    <p className="font-mono text-sm text-gray-400">
+                        Your device has been blacklisted by the system administrator.
+                    </p>
+                </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="h-[100dvh] flex flex-col bg-neo-white text-neo-black font-body overflow-hidden">
+        <div className="h-[100dvh] flex flex-col bg-chamber-black text-chamber-white font-body overflow-hidden relative">
             
+            {/* Background Image & Overlay */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <img 
+                src="/chamber2.jpeg" 
+                alt="Chamber Background" 
+                className="w-full h-full object-cover opacity-[0.15] object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-chamber-black via-chamber-black/80 to-chamber-black/60 mix-blend-multiply"></div>
+                {/* Tactical Scanning Lines */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-20 mix-blend-overlay"></div>
+            </div>
+
             {/* Header */}
-            <header className="flex-none p-4 flex items-center justify-between border-b-4 border-black bg-white z-10 shadow-sm">
+            <header className="flex-none p-4 flex items-center justify-between border-b border-chamber-gold/20 bg-chamber-navy/50 backdrop-blur-md z-10 relative">
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-chamber-gold/50 to-transparent"></div>
+                
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/')} className="hover:bg-neo-yellow border-2 border-transparent hover:border-black p-2 rounded-none transition-all">
-                        <ArrowLeft size={24} strokeWidth={3} />
+                    <button onClick={() => navigate('/')} className="text-chamber-gold hover:text-chamber-white transition-colors p-2">
+                        <ArrowLeft size={24} strokeWidth={2} />
                     </button>
-                    <button onClick={() => setIsAdminModalOpen(true)} className="p-2 border-2 border-transparent hover:border-black active:translate-y-1 transition-all">
-                        <Shield size={24} className={userRole === 'admin' ? "text-neo-blue" : "text-gray-400"} />
+                    <button onClick={() => setIsAdminModalOpen(true)} className="p-2 transition-colors">
+                        <Shield size={24} className={userRole === 'admin' ? "text-chamber-glow drop-shadow-[0_0_8px_rgba(255,214,107,0.8)]" : "text-gray-500 hover:text-chamber-gold"} />
                     </button>
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-display uppercase tracking-wider hidden md:block leading-none">DEAD DROP</h1>
+                        <h1 className="text-2xl font-display uppercase tracking-[0.2em] hidden md:block leading-none text-chamber-white">
+                            DEAD DROP
+                        </h1>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-                            <span className="text-xs font-bold uppercase tracking-widest">{isConnected ? 'ONLINE' : 'OFFLINE'}</span>
+                            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-chamber-gold shadow-[0_0_8px_rgba(212,175,55,0.8)]' : 'bg-red-500'}`}></span>
+                            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-400">{isConnected ? 'System Online' : 'System Offline'}</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 md:gap-4 ml-auto">
+                <div className="flex items-center gap-4 ml-auto">
                     <div 
                         onClick={copyRoomCode}
-                        className="cursor-pointer neo-card py-1 px-2 md:py-2 md:px-4 flex items-center gap-1 md:gap-2 hover:bg-neo-blue active:translate-y-1 active:shadow-none transition-all"
+                        className="cursor-pointer border border-chamber-gold/30 bg-chamber-black/50 px-4 py-2 flex items-center gap-3 hover:bg-chamber-gold/10 hover:border-chamber-gold transition-all group"
                     >
-                        <span className="font-bold font-mono tracking-widest text-sm md:text-lg">{roomCode}</span>
-                        {copiedId === 'room-code' ? <Check size={16} /> : <Copy size={16} />}
+                        <span className="font-mono tracking-[0.2em] text-sm md:text-base text-chamber-gold">{roomCode}</span>
+                        {copiedId === 'room-code' ? <Check size={16} className="text-chamber-glow" /> : <Copy size={16} className="text-chamber-gold/50 group-hover:text-chamber-gold" />}
                     </div>
-                    <div className="flex items-center gap-1 md:gap-2 border-2 border-dashed border-gray-400 p-1 md:p-2 hidden sm:flex">
-                        <span className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Your<br />ID</span>
-                        <span className="font-mono text-sm md:text-lg font-black bg-gray-100 px-1 md:px-2 py-1 leading-none">{deviceId}</span>
+                    <div className="flex items-center gap-2 border border-dashed border-gray-600 px-3 py-1 hidden sm:flex bg-chamber-black/50">
+                        <span className="text-[8px] font-mono text-gray-500 uppercase tracking-widest leading-none">ID</span>
+                        <span className="font-mono text-xs text-gray-300">{deviceId}</span>
                     </div>
                 </div>
             </header>
@@ -274,88 +297,103 @@ const Room = () => {
                 {isAdminModalOpen && (
                     <motion.div 
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-chamber-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                     >
                         <motion.div 
-                            initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white border-4 border-black p-6 w-full max-w-md shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col max-h-[80vh]"
+                            initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+                            className="glass-panel border-chamber-gold p-6 w-full max-w-lg flex flex-col max-h-[80vh] relative overflow-hidden"
                         >
-                            <div className="flex justify-between items-center mb-6 border-b-4 border-black pb-2">
-                                <h2 className="text-2xl font-display uppercase tracking-wider flex items-center gap-2">
-                                    <Shield size={24} /> Admin Panel
+                            {/* Corner Accents */}
+                            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-chamber-gold"></div>
+                            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-chamber-gold"></div>
+
+                            <div className="flex justify-between items-center mb-6 border-b border-chamber-gold/30 pb-4 relative">
+                                <h2 className="text-xl font-display uppercase tracking-[0.2em] flex items-center gap-3 text-chamber-gold">
+                                    <Shield size={20} /> Administrator Overlay
                                 </h2>
-                                <button onClick={() => setIsAdminModalOpen(false)} className="hover:text-red-500 hover:scale-110 active:scale-95 transition-all">
-                                    <X size={24} strokeWidth={3} />
+                                <button onClick={() => setIsAdminModalOpen(false)} className="text-gray-400 hover:text-chamber-white transition-colors">
+                                    <X size={24} strokeWidth={2} />
                                 </button>
                             </div>
 
                             {userRole !== 'admin' ? (
-                                <form onSubmit={handleAdminLogin} className="flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        value={adminInputCode}
-                                        onChange={e => setAdminInputCode(e.target.value)}
-                                        placeholder="Enter Admin Code..."
-                                        className="flex-1 neo-input text-lg tracking-widest"
-                                    />
-                                    <button type="submit" className="neo-btn bg-neo-yellow px-4">Login</button>
+                                <form onSubmit={handleAdminLogin} className="flex gap-4 mt-4">
+                                    <div className="relative flex-1 group">
+                                        <input 
+                                            type="password" 
+                                            value={adminInputCode}
+                                            onChange={e => setAdminInputCode(e.target.value)}
+                                            placeholder="AUTHORIZATION CODE"
+                                            className="tactical-input tracking-[0.3em] uppercase"
+                                        />
+                                    </div>
+                                    <button type="submit" className="tactical-btn">Verify</button>
                                 </form>
                             ) : (
-                                <div className="overflow-y-auto flex-1 space-y-3 pr-2">
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Active Devices</p>
+                                <div className="overflow-y-auto flex-1 space-y-4 pr-2 custom-scroll">
+                                    <p className="text-[10px] font-mono text-chamber-gold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                        <Crosshair size={12}/> Connected Entities
+                                    </p>
+                                    
                                     {activeUsers.map(u => (
-                                        <div key={u.deviceId} className="flex items-center justify-between border-2 border-black p-2 bg-neo-off-white">
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex flex-col">
-                                                    <span className="font-mono text-sm font-bold flex items-center gap-2">
-                                                        {u.deviceId} {u.deviceId === deviceId && "(You)"}
-                                                        <span className={`text-[10px] px-1 py-0.5 uppercase tracking-wider ${u.role === 'admin' ? 'bg-neo-yellow' : u.role === 'editor' ? 'bg-neo-green text-black' : u.role === 'converser' ? 'bg-neo-blue text-white' : u.role === 'viewer' ? 'bg-gray-200 text-gray-500' : 'bg-neo-pink text-white'}`}>
-                                                            {u.role}
-                                                        </span>
-                                                    </span>
+                                        <div key={u.deviceId} className="flex flex-col sm:flex-row sm:items-center justify-between border border-chamber-white/10 p-3 bg-chamber-black/40 hover:bg-chamber-white/5 transition-colors gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="font-mono text-sm text-gray-300 flex items-center gap-2">
+                                                    {u.deviceId} {u.deviceId === deviceId && <span className="text-chamber-gold text-xs">(Host)</span>}
                                                 </div>
+                                                <span className={`text-[9px] px-2 py-0.5 border uppercase tracking-widest ${
+                                                    u.role === 'admin' ? 'border-chamber-gold text-chamber-gold bg-chamber-gold/10' : 
+                                                    u.role === 'editor' ? 'border-green-500 text-green-500 bg-green-500/10' : 
+                                                    u.role === 'converser' ? 'border-blue-400 text-blue-400 bg-blue-400/10' : 
+                                                    u.role === 'viewer' ? 'border-gray-500 text-gray-400 bg-gray-500/10' : 
+                                                    'border-red-500 text-red-500 bg-red-500/10'
+                                                }`}>
+                                                    {u.role}
+                                                </span>
                                             </div>
                                             
                                             {u.deviceId !== deviceId && (
                                                 <div className="flex gap-2">
                                                     {u.role !== 'viewer' && (
-                                                        <button onClick={() => handleRoleChange(u.deviceId, 'reset')} className="p-1 border-2 border-black hover:bg-gray-200 active:translate-y-1 bg-white" title="Make Viewer (Strict Read-Only)">
-                                                            <Eye size={16} />
+                                                        <button onClick={() => handleRoleChange(u.deviceId, 'reset')} className="p-1.5 border border-chamber-white/20 text-gray-400 hover:text-white hover:border-white transition-all bg-transparent" title="Restrict to Viewer">
+                                                            <Eye size={14} />
                                                         </button>
                                                     )}
                                                     {u.role !== 'converser' && (
-                                                        <button onClick={() => handleRoleChange(u.deviceId, 'converser')} className="p-1 border-2 border-black hover:bg-neo-blue active:translate-y-1 bg-white text-black hover:text-white" title="Make Converser (Can Text)">
-                                                            <MessageSquare size={16} />
+                                                        <button onClick={() => handleRoleChange(u.deviceId, 'converser')} className="p-1.5 border border-chamber-white/20 text-gray-400 hover:text-blue-400 hover:border-blue-400 transition-all bg-transparent" title="Promote to Converser">
+                                                            <MessageSquare size={14} />
                                                         </button>
                                                     )}
                                                     {u.role !== 'editor' && (
-                                                        <button onClick={() => handleRoleChange(u.deviceId, 'editor')} className="p-1 border-2 border-black hover:bg-neo-green active:translate-y-1 bg-white" title="Make Editor (Can Text & Delete)">
-                                                            <UserCheck size={16} />
+                                                        <button onClick={() => handleRoleChange(u.deviceId, 'editor')} className="p-1.5 border border-chamber-white/20 text-gray-400 hover:text-green-400 hover:border-green-400 transition-all bg-transparent" title="Promote to Editor">
+                                                            <UserCheck size={14} />
                                                         </button>
                                                     )}
-                                                    <button onClick={() => handleRoleChange(u.deviceId, 'block')} className="p-1 border-2 border-black hover:bg-neo-pink active:translate-y-1 bg-white" title="Block Device">
-                                                        <UserX size={16} />
+                                                    <button onClick={() => handleRoleChange(u.deviceId, 'block')} className="p-1.5 border border-chamber-white/20 text-gray-400 hover:text-red-500 hover:border-red-500 transition-all bg-transparent" title="Terminate Connection">
+                                                        <UserX size={14} />
                                                     </button>
                                                 </div>
                                             )}
                                         </div>
                                     ))}
-                                    {activeUsers.length === 0 && <div className="text-center font-bold text-sm text-gray-400 py-4">No active devices</div>}
+                                    {activeUsers.length === 0 && <div className="text-center font-mono text-xs text-gray-500 py-6 border border-dashed border-gray-700">No signals detected</div>}
 
                                     {/* Blocked Devices Section */}
                                     {blockedUsers.length > 0 && (
                                         <>
-                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-6 mb-4 pt-4 border-t-2 border-gray-200">Blocked Devices</p>
+                                            <p className="text-[10px] font-mono text-red-500 uppercase tracking-[0.2em] mt-8 mb-4 flex items-center gap-2">
+                                                <ShieldAlert size={12}/> Blacklisted Entities
+                                            </p>
                                             {blockedUsers.map(badId => (
-                                                <div key={badId} className="flex items-center justify-between border-2 border-neo-pink p-2 bg-pink-50">
-                                                    <div className="flex items-center gap-2 text-neo-pink font-mono text-sm font-bold opacity-75">
+                                                <div key={badId} className="flex items-center justify-between border border-red-500/30 p-3 bg-red-500/5">
+                                                    <div className="flex items-center gap-3 text-red-400/80 font-mono text-sm">
                                                         <ShieldAlert size={16} /> {badId}
                                                     </div>
                                                     <button 
                                                         onClick={() => handleRoleChange(badId, 'reset')} 
-                                                        className="px-3 py-1 border-2 border-black bg-white hover:bg-neo-yellow active:translate-y-1 text-xs font-bold uppercase"
+                                                        className="text-[10px] font-mono uppercase tracking-widest border border-red-500/50 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1 transition-all"
                                                     >
-                                                        Unblock
+                                                        Revoke Ban
                                                     </button>
                                                 </div>
                                             ))}
@@ -369,23 +407,26 @@ const Room = () => {
             </AnimatePresence>
 
             {!isConnected && (
-                <div className="bg-red-500 text-white text-center text-xs font-bold py-1 px-4 border-b-4 border-black">
-                    <WifiOff size={12} className="inline mr-2" />
-                    CONNECTION LOST - ATTEMPTING TO RECONNECT...
+                <div className="bg-red-500/10 border-y border-red-500 text-red-500 text-center text-xs font-mono py-2 uppercase tracking-[0.2em] z-20 backdrop-blur-sm">
+                    <WifiOff size={14} className="inline mr-2" />
+                    Warning: Uplink severed. Attempting to re-establish connection...
                 </div>
             )}
 
             {/* Message List */}
-            <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]">
+            <main className="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 custom-scroll">
                 <div className="max-w-4xl mx-auto space-y-6">
                     <AnimatePresence mode="popLayout">
                         {messages.length === 0 && (
                             <motion.div 
                                 initial={{ opacity: 0 }} 
                                 animate={{ opacity: 0.5 }}
-                                className="text-center py-20 font-display text-4xl text-gray-400 uppercase"
+                                className="text-center py-32 flex flex-col items-center justify-center gap-4"
                             >
-                                Drop Zone Empty
+                                <div className="w-16 h-16 border border-chamber-gold/30 rounded-full flex items-center justify-center animate-pulse">
+                                    <Crosshair size={24} className="text-chamber-gold/50" />
+                                </div>
+                                <p className="font-mono text-xs uppercase tracking-[0.3em] text-chamber-gold/50">Drop Zone Secure. Awaiting Data.</p>
                             </motion.div>
                         )}
 
@@ -393,56 +434,62 @@ const Room = () => {
                             <motion.div
                                 key={msg._id}
                                 layout
-                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                                className="neo-card flex flex-col md:flex-row gap-4 group relative"
+                                initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+                                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)', transition: { duration: 0.2 } }}
+                                className="glass-panel p-5 flex flex-col md:flex-row gap-5 group relative overflow-hidden"
                             >
+                                {/* Decorative line */}
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-chamber-gold to-transparent opacity-50"></div>
+
                                 {/* Icon Type Indicator */}
-                                <div className={`flex-none w-12 h-12 flex items-center justify-center border-2 border-black ${msg.type === 'file' ? 'bg-neo-blue' : 'bg-neo-yellow'}`}>
-                                    {msg.type === 'file' ? <FileText size={24} strokeWidth={2.5} /> : <div className="font-display text-xl">T</div>}
+                                <div className={`flex-none w-10 h-10 flex items-center justify-center border border-chamber-gold/30 ${msg.type === 'file' ? 'bg-chamber-gold/10 text-chamber-glow' : 'bg-chamber-navy text-chamber-gold'}`}>
+                                    {msg.type === 'file' ? <FileText size={18} strokeWidth={1.5} /> : <div className="font-display text-lg">_</div>}
                                 </div>
 
                                 {/* Content Display */}
                                 <div className="flex-1 min-w-0 pr-12">
                                     {msg.type === 'text' ? (
-                                        <div className="font-mono whitespace-pre-wrap break-words leading-relaxed">
+                                        <div className="font-mono text-gray-300 text-sm whitespace-pre-wrap break-words leading-relaxed">
                                             {msg.content}
                                         </div>
                                     ) : (
                                         <div className="flex flex-col gap-2">
-                                            <span className="font-bold truncate text-lg">{msg.content}</span>
+                                            <span className="font-mono text-chamber-white truncate text-base">{msg.content}</span>
                                             <a 
                                                 href={msg.fileUrl} 
                                                 target="_blank" 
                                                 rel="noreferrer"
-                                                className="inline-flex items-center gap-2 text-sm font-bold underline hover:text-neo-blue"
+                                                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-chamber-gold hover:text-chamber-glow transition-colors w-max"
                                             >
-                                                <Download size={14} /> Download File
+                                                <Download size={14} /> Acquire Asset
                                             </a>
                                         </div>
                                     )}
-                                    <div className="mt-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                        {new Date(msg.createdAt).toLocaleTimeString()}
+                                    <div className="mt-4 flex items-center gap-3">
+                                        <div className="h-[1px] w-8 bg-chamber-white/10"></div>
+                                        <span className="text-[10px] font-mono text-gray-500 tracking-[0.2em]">
+                                            {new Date(msg.createdAt).toLocaleTimeString()}
+                                        </span>
                                     </div>
                                 </div>
 
                                 {/* Message Actions */}
-                                <div className="flex md:flex-col gap-2 md:absolute md:top-4 md:right-4">
+                                <div className="flex md:flex-col gap-2 md:absolute md:top-5 md:right-5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                     <button 
                                         onClick={() => handleCopy(msg.type === 'text' ? msg.content : msg.fileUrl, msg._id)}
-                                        className="p-2 border-2 border-black hover:bg-neo-green hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all bg-white"
-                                        title="Copy"
+                                        className="p-2 border border-chamber-white/20 text-gray-400 hover:text-chamber-gold hover:border-chamber-gold transition-colors bg-chamber-navy/50"
+                                        title="Copy Data"
                                     >
-                                        {copiedId === msg._id ? <Check size={16} /> : <Copy size={16} />}
+                                        {copiedId === msg._id ? <Check size={14} className="text-chamber-gold" /> : <Copy size={14} />}
                                     </button>
                                     {(userRole === 'admin' || userRole === 'editor') && (
                                         <button 
                                             onClick={() => handleDelete(msg._id)}
-                                            className="p-2 border-2 border-black hover:bg-neo-pink hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all bg-white"
-                                            title="Delete"
+                                            className="p-2 border border-chamber-white/20 text-gray-400 hover:text-red-500 hover:border-red-500 transition-colors bg-chamber-navy/50"
+                                            title="Purge Data"
                                         >
-                                            <Trash2 size={16} />
+                                            <Trash2 size={14} />
                                         </button>
                                     )}
                                 </div>
@@ -455,20 +502,29 @@ const Room = () => {
 
             {/* Input & Upload Area */}
             {userRole !== 'viewer' && (
-            <div className="flex-none p-4 md:p-6 bg-white border-t-4 border-black z-20">
+            <div className="flex-none p-4 md:p-6 bg-chamber-navy/80 border-t border-chamber-gold/20 backdrop-blur-md z-20 relative">
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-chamber-gold/30 to-transparent"></div>
+                
                 <div className="max-w-4xl mx-auto">
-                    {file && (
-                        <div className="flex items-center justify-between bg-neo-off-white border-2 border-black p-3 mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <span className="flex items-center gap-2 font-bold truncate">
-                                <Paperclip size={18} /> {file.name}
-                            </span>
-                            <button onClick={() => setFile(null)} className="hover:text-red-600 border-2 border-transparent hover:border-black p-1">
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-                    )}
+                    <AnimatePresence>
+                        {file && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="flex items-center justify-between border border-chamber-gold/30 bg-chamber-gold/5 p-3 mb-4"
+                            >
+                                <span className="flex items-center gap-3 font-mono text-sm text-chamber-gold truncate">
+                                    <Paperclip size={16} /> {file.name}
+                                </span>
+                                <button onClick={() => setFile(null)} className="text-gray-400 hover:text-red-500 transition-colors p-1">
+                                    <X size={16} />
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                     
-                    <form onSubmit={handleSendMessage} className="flex gap-4">
+                    <form onSubmit={handleSendMessage} className="flex gap-3 md:gap-4">
                          <div className="relative flex-none">
                             <input 
                                 type="file" 
@@ -479,32 +535,38 @@ const Room = () => {
                             <button 
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="h-full px-4 border-2 border-black bg-neo-off-white hover:bg-neo-blue hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:shadow-none"
+                                className="h-full px-4 border border-chamber-gold/30 bg-chamber-black/50 text-chamber-gold hover:bg-chamber-gold/10 hover:border-chamber-gold transition-all flex items-center justify-center group"
                             >
-                                <Paperclip size={24} strokeWidth={2.5} />
+                                <Paperclip size={20} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
                         
-                        <textarea
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSendMessage(e);
-                                }
-                            }}
-                            placeholder={file ? `Click Send to upload ${file.name}` : "Type a message... (Shift+Enter for new line)"}
-                            className="flex-1 neo-input min-h-[60px] max-h-[150px] resize-none"
-                            disabled={isUploading || isSending}
-                        />
+                        <div className="flex-1 relative group">
+                            <textarea
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage(e);
+                                    }
+                                }}
+                                placeholder={file ? `Awaiting execution for ${file.name}` : "Input transmission... (Shift+Enter for multi-line)"}
+                                className="tactical-input min-h-[50px] max-h-[150px] resize-none h-full py-3.5"
+                                disabled={isUploading || isSending}
+                            />
+                        </div>
                         
                         <button 
                             type="submit" 
                             disabled={isUploading || isSending || (!newMessage.trim() && !file)}
-                            className="bg-neo-green text-black neo-btn disabled:opacity-50 disabled:shadow-none disabled:translate-y-0"
+                            className="tactical-btn flex-none !px-4 md:!px-8 disabled:opacity-30 disabled:cursor-not-allowed group"
                         >
-                            {isUploading || isSending ? <div className="animate-spin w-6 h-6 border-4 border-black border-t-transparent rounded-full " /> : <Send size={24} strokeWidth={2.5} />}
+                            {isUploading || isSending ? (
+                                <div className="animate-spin w-5 h-5 border-2 border-chamber-gold border-t-transparent rounded-full" />
+                            ) : (
+                                <Send size={20} className="group-hover:translate-x-1 transition-transform" />
+                            )}
                         </button>
                     </form>
                 </div>
