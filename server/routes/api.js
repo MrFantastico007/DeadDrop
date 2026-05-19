@@ -120,6 +120,14 @@ router.post('/message', async (req, res) => {
 // Delete a message and its associated file if applicable
 router.delete('/message/:id', async (req, res) => {
     try {
+        const deviceId = req.headers.deviceid;
+        const perm = await getPermissions();
+        const role = getRoleForDevice(perm, deviceId);
+        
+        if (role !== 'admin' && role !== 'editor') {
+            return res.status(403).json({ error: 'Forbidden. You do not have Delete permissions.' });
+        }
+
         const message = await Message.findById(req.params.id);
         if (!message) return res.status(404).json({ error: 'Message not found' });
 
