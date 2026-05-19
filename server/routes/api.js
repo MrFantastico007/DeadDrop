@@ -252,16 +252,19 @@ router.post('/admin/role', async (req, res) => {
 
     const io = require('../utils/socket').getIO();
 
-    // If blocked, forcefully disconnect their active sockets in that room
-    if (action === 'block') {
-        const socketUtils = require('../utils/socket');
-        const activeUsers = socketUtils.getActiveUsers();
-        for (const [socketId, user] of activeUsers.entries()) {
-            if (user.deviceId === targetId && user.roomCode === roomCode) {
-                const targetSocket = io.sockets.sockets.get(socketId);
-                if (targetSocket) {
+    // Handle live socket updates for the target user
+    const socketUtils = require('../utils/socket');
+    const activeUsers = socketUtils.getActiveUsers();
+    for (const [socketId, user] of activeUsers.entries()) {
+        if (user.deviceId === targetId && user.roomCode === roomCode) {
+            const targetSocket = io.sockets.sockets.get(socketId);
+            if (targetSocket) {
+                if (action === 'block') {
+                    targetSocket.leave(roomCode);
                     targetSocket.emit('access_denied', { reason: 'blocked' });
-                    targetSocket.disconnect(true);
+                } else {
+                    targetSocket.join(roomCode);
+                    targetSocket.emit('role_update', { targetId, action });
                 }
             }
         }

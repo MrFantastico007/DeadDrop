@@ -68,7 +68,15 @@ const Room = () => {
                 if (data.action === 'block') setUserRole('blocked');
                 if (data.action === 'editor') setUserRole('editor');
                 if (data.action === 'converser') setUserRole('converser');
-                if (data.action === 'reset') setUserRole('viewer');
+                if (data.action === 'reset') {
+                    setUserRole('viewer');
+                    // Automatically re-fetch missed messages while they were banned
+                    axios.post(`${ENDPOINT}/api/room/join`, { roomCode, deviceId })
+                        .then(res => {
+                            if (res.data.messages) setMessages(res.data.messages);
+                        })
+                        .catch(err => console.error("Failed to sync messages post-unban", err));
+                }
             }
         });
 
