@@ -138,6 +138,7 @@ router.post('/message', async (req, res) => {
 });
 
 // Delete a message and its associated file if applicable
+router.delete('/message/:id', async (req, res) => {
     try {
         const deviceId = req.headers.deviceid;
         const message = await Message.findById(req.params.id);
