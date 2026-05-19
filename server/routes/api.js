@@ -117,10 +117,10 @@ router.delete('/message/:id', async (req, res) => {
 });
 
 // Scheduled cleanup task (called by cron job)
-// Removes rooms where the last activity was more than 2 hours ago
+// Removes rooms where the last activity was more than 24 hours ago
 router.get('/cleanup', async (req, res) => {
     try {
-        const threshold = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 hours ago
+        const threshold = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
         
         // 1. Find all rooms that have had activity (created messages) AFTER the threshold
         // These are the "active" rooms we want to KEEP.
