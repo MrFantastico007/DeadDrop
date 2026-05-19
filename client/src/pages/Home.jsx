@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, ArrowRight, Upload, Zap, Github, Star } from 'lucide-react';
+import { Crosshair, ArrowRight, Upload, Zap, Github, Star, ShieldAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Home = () => {
@@ -20,137 +20,187 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neo-white text-neo-black font-body overflow-x-hidden relative">
-      {/* Decorative Background Elements - Hidden on mobile to reduce clutter */}
-      <div className="hidden md:block absolute top-20 left-10 w-16 h-16 bg-neo-yellow border-4 border-black rounded-full animate-float opacity-80 z-0"></div>
-      <div className="hidden md:block absolute bottom-40 right-20 w-24 h-24 bg-neo-blue border-4 border-black rotate-12 animate-wiggle z-0"></div>
+    <div className="min-h-screen bg-chamber-black text-chamber-white font-body overflow-x-hidden relative flex flex-col">
+      {/* Background Image & Overlay */}
+      <div className="fixed inset-0 z-0">
+        <img 
+          src="/chamber1.jpeg" 
+          alt="Chamber Background" 
+          className="w-full h-full object-cover opacity-30 object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/80 via-chamber-black/60 to-chamber-black/95 mix-blend-multiply"></div>
+        {/* Tactical Scanning Lines */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-20 mix-blend-overlay"></div>
+      </div>
       
-      <div className="container mx-auto px-4 py-12 min-h-screen flex flex-col items-center justify-center relative z-10">
-        
-        {/* Main Title */}
-        <motion.div 
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className="text-center mb-12 relative"
-        >
-          {/* Mascot Peeking */}
-          <img 
-            src="/character.png" 
-            alt="Mascot"
-            className="absolute -top-16 md:-top-20 left-1/2 -translate-x-1/2 w-20 md:w-28 object-contain -z-20 animate-peek"
-          />
+      {/* Ambient Lighting */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-chamber-gold/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-chamber-navy/40 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
-          <div className="inline-block relative">
-            <h1 className="text-5xl md:text-8xl font-display uppercase tracking-widest relative z-10">
-              DeadDrop
+      <div className="container mx-auto px-4 py-12 flex-1 flex flex-col items-center justify-center relative z-10">
+        
+        {/* Main Title Section */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-16 relative w-full max-w-2xl"
+        >
+          {/* Subtle Grid Behind Title */}
+          <div className="absolute inset-0 bg-tactical-grid opacity-20 -z-10"></div>
+          
+          <div className="inline-flex flex-col items-center">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="h-px bg-chamber-gold/50 mb-6"
+            />
+            
+            <h1 className="text-5xl md:text-8xl font-display font-bold uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-b from-chamber-white to-gray-400 holographic-text relative">
+              DEAD DROP
+              <span className="absolute -inset-1 opacity-20 bg-chamber-glow blur-2xl -z-10 animate-pulse-glow"></span>
             </h1>
-            <div className="absolute -bottom-2 -right-2 w-full h-full bg-neo-green -z-10"></div>
+            
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 1, delay: 0.4 }}
+              className="h-px bg-chamber-gold/50 mt-6 mb-4"
+            />
+
+            <p className="mt-2 text-sm md:text-base font-mono uppercase tracking-[0.3em] text-chamber-gold font-light">
+              Secure • Ephemeral • Precise
+            </p>
           </div>
-          <p className="mt-4 text-xl font-bold uppercase tracking-wider bg-black text-white inline-block px-4 py-1 rotate-[-2deg]">
-            Secure • Ephemeral • Instant
-          </p>
         </motion.div>
 
-        {/* Action Cards */}
-        <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl">
+        {/* Action Interface */}
+        <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl relative">
           
-          {/* Join Room Card */}
+          {/* Join Module */}
           <motion.div 
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="neo-card bg-neo-pink/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="glass-panel p-8 relative overflow-hidden group"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-neo-black text-white p-3 rounded-none border-2 border-transparent">
-                <Box size={32} />
+            {/* Corner Accents */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-chamber-gold"></div>
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-chamber-gold"></div>
+
+            <div className="flex items-center gap-4 mb-8">
+              <div className="text-chamber-gold bg-chamber-gold/10 p-3">
+                <Crosshair size={24} strokeWidth={1.5} />
               </div>
-              <h2 className="text-3xl font-display uppercase">Join Room</h2>
+              <h2 className="text-2xl font-display uppercase tracking-widest text-chamber-white font-light">Access Node</h2>
             </div>
             
-            <form onSubmit={handleJoin} className="flex flex-col gap-4">
+            <form onSubmit={handleJoin} className="flex flex-col gap-6">
               <div className="relative">
-                <label className="block text-sm font-bold uppercase mb-2">Room Code</label>
-                <input
-                  type="text"
-                  value={roomCode}
-                  onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                  placeholder="ENTER CODE"
-                  className="neo-input bg-white uppercase placeholder:text-gray-400"
-                />
+                <label className="block text-xs font-mono uppercase tracking-widest text-gray-400 mb-3">Target Coordinate [Room Code]</label>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={roomCode}
+                    onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                    placeholder="ENTER DESIGNATION"
+                    className="tactical-input pl-4"
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none opacity-50 text-chamber-gold">
+                    <span className="animate-pulse">_</span>
+                  </div>
+                </div>
               </div>
               <button 
                 type="submit" 
                 disabled={!roomCode}
-                className="neo-btn bg-neo-yellow text-black w-full flex items-center justify-center gap-2 hover:bg-neo-yellow/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="tactical-btn w-full flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed group"
               >
-                <span>Launch</span>
-                <ArrowRight size={20} strokeWidth={3} />
+                <span>Initialize</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
           </motion.div>
 
-          {/* Create Room Card */}
+          {/* Create Module */}
           <motion.div 
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="neo-card bg-neo-green/20 relative overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="glass-panel p-8 relative overflow-hidden group"
           > 
-             {/* "New" Badge */}
-            <div className="absolute -top-3 -right-3 bg-neo-blue border-2 border-black px-3 py-1 font-bold text-xs uppercase rotate-12 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              Instant
+            {/* Corner Accents */}
+            <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-chamber-gold"></div>
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-chamber-gold"></div>
+
+             {/* Tactical Status Badge */}
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-chamber-gold opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-chamber-glow"></span>
+              </span>
+              <span className="text-[10px] font-mono tracking-widest text-chamber-gold uppercase">Ready</span>
             </div>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-neo-black text-white p-3 rounded-none">
-                <Zap size={32} />
+            <div className="flex items-center gap-4 mb-8">
+              <div className="text-chamber-gold bg-chamber-gold/10 p-3">
+                <Zap size={24} strokeWidth={1.5} />
               </div>
-              <h2 className="text-3xl font-display uppercase">Create Room</h2>
+              <h2 className="text-2xl font-display uppercase tracking-widest text-chamber-white font-light">Deploy Node</h2>
             </div>
             
-            <p className="font-bold mb-8 leading-relaxed">
-              Start a new secure drop zone. Share the code with peers to begin transferring files immediately.
+            <p className="font-mono text-sm text-gray-400 mb-8 leading-relaxed tracking-wide">
+              Generate a secure, encrypted drop zone. Distribute the coordinate code to field operatives for immediate transmission.
             </p>
             
             <button 
               onClick={handleCreate}
-              className="neo-btn bg-neo-blue text-black w-full flex items-center justify-center gap-2"
+              className="tactical-btn w-full flex items-center justify-center gap-3 group mt-auto"
             >
-              <span>Initiate Drop</span>
-              <Upload size={20} strokeWidth={3} />
+              <span>Deploy System</span>
+              <Upload size={18} className="group-hover:-translate-y-1 transition-transform" />
             </button>
           </motion.div>
 
         </div>
 
-        {/* Footer Warning */}
-        <div className="mt-16 text-center space-y-8">
-          <p className="font-mono text-xs bg-red-500 text-white inline-block px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            WARNING: DATA SELF-DESTRUCTS AFTER 2H INACTIVITY
-          </p>
+        {/* Footer Area */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.8 }}
+          className="mt-20 text-center space-y-8 w-full max-w-4xl"
+        >
+          {/* Warning Banner */}
+          <div className="flex items-center justify-center">
+            <div className="inline-flex items-center gap-3 border border-red-500/30 bg-red-500/5 px-4 py-2 relative overflow-hidden">
+              <ShieldAlert size={14} className="text-red-400" />
+              <p className="font-mono text-[10px] text-red-400 uppercase tracking-widest">
+                Protocol: Self-Destruct Active. Data purged after 24H.
+              </p>
+              <div className="absolute bottom-0 left-0 h-[1px] bg-red-500/50 w-full animate-scan"></div>
+            </div>
+          </div>
 
-          {/* Credits Footer */}
-          <div className="flex flex-col items-center gap-4 font-display uppercase tracking-widest text-sm">
+          {/* Credits */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 font-mono text-[10px] uppercase tracking-widest text-gray-500 pt-8 border-t border-chamber-white/10">
             <p>
-              Made by <span className="text-neo-pink">Ankush Samanta</span>
+              Architect: <span className="text-chamber-gold">Ankush Samanta</span>
             </p>
+            <span className="hidden md:block w-1 h-1 bg-chamber-gold/50 rotate-45"></span>
             <a 
               href="https://github.com/MrFantastico007/DeadDrop" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-3 bg-neo-white border-2 border-black px-6 py-3 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-0 active:shadow-none bg-neo-yellow/20 hover:bg-neo-yellow"
+              className="group flex items-center gap-3 hover:text-chamber-white transition-colors"
             >
-              <Github size={20} />
-              <div className="flex flex-col items-start leading-none">
-                <span className="text-[10px] font-bold">Open Source</span>
-                <span className="font-bold">Star on GitHub</span>
-              </div>
-              <Star size={20} className="fill-black group-hover:rotate-180 transition-transform duration-500" />
+              <Github size={14} />
+              <span>GitHub Repository</span>
+              <Star size={12} className="group-hover:text-chamber-gold transition-colors" />
             </a>
           </div>
-        </div>
+        </motion.div>
 
       </div>
     </div>
