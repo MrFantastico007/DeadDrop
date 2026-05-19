@@ -47,11 +47,6 @@ const Room = () => {
         newSocket.on('connect', () => {
             setIsConnected(true);
             newSocket.emit('join_room', { roomCode, deviceId });
-
-            // Auto-join admin channel if already known as admin locally
-            if (userRole === 'admin') {
-                newSocket.emit('join_admin_channel', { deviceId, roomCode });
-            }
         });
 
         newSocket.on('disconnect', () => {
@@ -92,8 +87,11 @@ const Room = () => {
                 if (res.data.messages) {
                     setMessages(res.data.messages);
                 }
-                if (res.data.role && res.data.role !== 'admin') {
+                if (res.data.role) {
                     setUserRole(res.data.role);
+                    if (res.data.role === 'admin') {
+                        newSocket.emit('join_admin_channel', { deviceId, roomCode });
+                    }
                 }
             } catch (err) {
                 console.error("Failed to join room/fetch messages", err);
