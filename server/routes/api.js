@@ -49,12 +49,15 @@ const upload = multer({
 
 // Join a room and fetch its history
 router.post('/room/join', async (req, res) => {
-  const { roomCode } = req.body;
+  const { roomCode, deviceId } = req.body;
   if (!roomCode) return res.status(400).json({ error: 'Room code is required' });
   
   try {
+    const perm = await getPermissions();
+    const role = getRoleForDevice(perm, deviceId);
+    
     const messages = await Message.find({ roomCode }).sort({ createdAt: 1 });
-    res.json({ success: true, messages });
+    res.json({ success: true, messages, role });
   } catch (err) {
     res.status(500).json({ error: 'Failed to join room' });
   }
