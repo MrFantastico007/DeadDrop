@@ -195,6 +195,14 @@ const Room = () => {
     const handleRoleChange = async (targetId, action) => {
         try {
             await axios.post(`${ENDPOINT}/api/admin/role`, { roomCode, targetId, action }, { headers: { deviceid: deviceId } });
+            
+            // Foolproof UI update for blocked list
+            if (action === 'block' || action === 'reset') {
+                const res = await axios.get(`${ENDPOINT}/api/admin/blocked?roomCode=${roomCode}`, { headers: { deviceid: deviceId } });
+                if (res.data.success) {
+                    setBlockedUsers(res.data.blocked);
+                }
+            }
         } catch (err) {
             console.error(err);
             alert("Action failed.");
@@ -264,9 +272,12 @@ const Room = () => {
                         <span className="font-mono tracking-[0.2em] text-sm md:text-base text-chamber-gold">{roomCode}</span>
                         {copiedId === 'room-code' ? <Check size={16} className="text-chamber-glow" /> : <Copy size={16} className="text-chamber-gold/50 group-hover:text-chamber-gold" />}
                     </div>
-                    <div className="flex items-center gap-2 border border-dashed border-gray-600 px-3 py-1 hidden sm:flex bg-chamber-black/50">
-                        <span className="text-[8px] font-mono text-gray-500 uppercase tracking-widest leading-none">ID</span>
-                        <span className="font-mono text-xs text-gray-300">{deviceId}</span>
+                    <div className="flex items-center gap-2 border border-dashed border-gray-600 px-2 sm:px-3 py-1 bg-chamber-black/50 overflow-hidden max-w-[120px] sm:max-w-none">
+                        <span className="text-[8px] font-mono text-gray-500 uppercase tracking-widest leading-none hidden sm:block">ID</span>
+                        <span className="font-mono text-[10px] sm:text-xs text-gray-300 truncate">
+                            <span className="hidden sm:inline">{deviceId}</span>
+                            <span className="sm:hidden">{deviceId.substring(0, 11)}...</span>
+                        </span>
                     </div>
                 </div>
             </header>
