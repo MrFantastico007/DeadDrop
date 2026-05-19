@@ -201,4 +201,81 @@ router.get('/cleanup', async (req, res) => {
     }
 });
 
+// --- Admin Routes ---
+router.post('/admin/login', async (req, res) => {
+    const { adminCode, deviceId } = req.body;
+    if (!adminCode || !deviceId) return res.status(400).json({ error: 'Missing data' });
+    
+    if (adminCode === global.SERVER_ADMIN_CODE) {
+        const perm = await getPermissions();
+        if (!perm.admins.includes(deviceId)) {
+            perm.admins.push(deviceId);
+            // Remove from other roles if present
+            perm.editors = perm.editors.filter(id => id !== deviceId);
+            perm.blocked = perm.blocked.filter(id => id !== deviceId);
+            await perm.save();
+        }
+        res.json({ success: true, role: 'admin' });
+    } else {
+        res.status(401).json({ error: 'Invalid code' });
+    }
+});
+
+router.post('/admin/role', async (req, res) => {
+    const { targetId, action } = req.body; // action: 'editor', 'converser', 'block', 'reset'
+    const adminId = req.headers.deviceid;
+    const perm = await getPermissions();
+    
+    if (!perm.admins.includes(adminId)) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+    if (perm.admins.includes(targetId)) {
+        return res.status(400).json({ error: 'Cannot modify another admin' });
+    }
+
+    // Clean current roles for target
+    perm.editors = perm.editors.filter(id => id !== targetId);
+    perm.conversers = perm.conversers.filter(id => id !== targetId);
+    perm.blocked = perm.blocked.filter(id => id !== targetId);
+
+    if (action === 'editor') perm.editors.push(targetId);
+    if (action === 'converser') perm.conversers.push(targetId);
+    if (action === 'block') perm.blocked.push(targetId);
+    
+    await perm.save();
+
+    const io = require('../utils/socket').getIO();
+
+    // If blocked, forcefully disconnect their active sockets
+    if (action === 'block') {
+        const socketUtils = require('../utils/socket');
+        const activeUsers = socketUtils.getActiveUsers();
+        for (const [socketId, user] of activeUsers.entries()) {
+            if (user.deviceId === targetId) {
+                const targetSocket = io.sockets.sockets.get(socketId);
+                if (targetSocket) {
+                    targetSocket.emit('access_denied', { reason: 'blocked' });
+                    targetSocket.disconnect(true);
+                }
+            }
+        }
+    }
+
+    // Broadcast updates
+    require('../utils/socket').broadcastActiveUsers();
+    io.to('admin_channel').emit('blocked_users_update', perm.blocked);
+    io.emit('role_update', { targetId, action });
+
+    res.json({ success: true });
+});
+
+router.get('/admin/blocked', async (req, res) => {
+    const adminId = req.headers.deviceid;
+    const perm = await getPermissions();
+    if (!perm.admins.includes(adminId)) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+    res.json({ success: true, blocked: perm.blocked });
+});
+
 module.exports = router;
