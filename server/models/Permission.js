@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const permissionSchema = new mongoose.Schema({
-  // Use a singleton document with a known ID to store global permissions
-  singleton: {
+  roomCode: {
     type: String,
-    default: 'GLOBAL',
-    unique: true
+    required: true,
+    unique: true,
+    index: true
   },
-  admins: {
-    type: [String],
-    default: []
+  admin: {
+    type: String,
+    required: true
   },
   editors: {
     type: [String],

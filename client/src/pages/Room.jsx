@@ -23,7 +23,6 @@ const Room = () => {
     const [deviceId] = useState(() => getDeviceId());
     const [userRole, setUserRole] = useState('viewer');
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
-    const [adminInputCode, setAdminInputCode] = useState('');
     const [activeUsers, setActiveUsers] = useState([]);
     const [blockedUsers, setBlockedUsers] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -51,7 +50,7 @@ const Room = () => {
 
             // Auto-join admin channel if already known as admin locally
             if (userRole === 'admin') {
-                newSocket.emit('join_admin_channel', deviceId);
+                newSocket.emit('join_admin_channel', { deviceId, roomCode });
             }
         });
 
@@ -195,26 +194,9 @@ const Room = () => {
         setTimeout(() => setCopiedId(null), 2000);
     };
 
-    const handleAdminLogin = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post(`${ENDPOINT}/api/admin/login`, { adminCode: adminInputCode, deviceId });
-            if (res.data.success) {
-                setUserRole('admin');
-                setIsAdminModalOpen(false);
-                setAdminInputCode('');
-                if (socket) socket.emit('join_admin_channel', deviceId);
-                const blockedRes = await axios.get(`${ENDPOINT}/api/admin/blocked`, { headers: { deviceid: deviceId } });
-                if (blockedRes.data.success) setBlockedUsers(blockedRes.data.success.blocked || blockedRes.data.blocked);
-            }
-        } catch (err) {
-            alert('Invalid Authorization Code');
-        }
-    };
-
     const handleRoleChange = async (targetId, action) => {
         try {
-            await axios.post(`${ENDPOINT}/api/admin/role`, { targetId, action }, { headers: { deviceid: deviceId } });
+            await axios.post(`${ENDPOINT}/api/admin/role`, { roomCode, targetId, action }, { headers: { deviceid: deviceId } });
         } catch (err) {
             console.error(err);
             alert("Action failed.");
@@ -262,8 +244,8 @@ const Room = () => {
                     <button onClick={() => navigate('/')} className="text-chamber-gold hover:text-chamber-white transition-colors p-2">
                         <ArrowLeft size={24} strokeWidth={2} />
                     </button>
-                    <button onClick={() => setIsAdminModalOpen(true)} className="p-2 transition-colors">
-                        <Shield size={24} className={userRole === 'admin' ? "text-chamber-glow drop-shadow-[0_0_8px_rgba(255,214,107,0.8)]" : "text-gray-500 hover:text-chamber-gold"} />
+                    <button onClick={() => { if (userRole === 'admin') setIsAdminModalOpen(true); }} className={`p-2 transition-colors ${userRole === 'admin' ? '' : 'cursor-not-allowed opacity-50'}`} title={userRole === 'admin' ? 'Manage Room' : 'Admin Only'}>
+                        <Shield size={24} className={userRole === 'admin' ? "text-chamber-glow drop-shadow-[0_0_8px_rgba(255,214,107,0.8)]" : "text-gray-500"} />
                     </button>
                     <div className="flex flex-col">
                         <h1 className="text-2xl font-display uppercase tracking-[0.2em] hidden md:block leading-none text-chamber-white">
@@ -315,31 +297,22 @@ const Room = () => {
                                 </button>
                             </div>
 
-                            {userRole !== 'admin' ? (
-                                <form onSubmit={handleAdminLogin} className="flex gap-4 mt-4">
-                                    <div className="relative flex-1 group">
-                                        <input 
-                                            type="password" 
-                                            value={adminInputCode}
-                                            onChange={e => setAdminInputCode(e.target.value)}
-                                            placeholder="AUTHORIZATION CODE"
-                                            className="tactical-input tracking-[0.3em] uppercase"
-                                        />
-                                    </div>
-                                    <button type="submit" className="tactical-btn">Verify</button>
-                                </form>
-                            ) : (
-                                <div className="overflow-y-auto flex-1 space-y-4 pr-2 custom-scroll">
-                                    <p className="text-[10px] font-mono text-chamber-gold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                        <Crosshair size={12}/> Connected Entities
-                                    </p>
-                                    
-                                    {activeUsers.map(u => (
-                                        <div key={u.deviceId} className="flex flex-col sm:flex-row sm:items-center justify-between border border-chamber-white/10 p-3 bg-chamber-black/40 hover:bg-chamber-white/5 transition-colors gap-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="font-mono text-sm text-gray-300 flex items-center gap-2">
-                                                    {u.deviceId} {u.deviceId === deviceId && <span className="text-chamber-gold text-xs">(Host)</span>}
-                                                </div>
+                            <div className="overflow-y-auto flex-1 space-y-4 pr-2 custom-scroll mt-4">
+                                <p className="text-[10px] font-mono text-chamber-gold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                    <Crosshair size={12}/> Connected Entities
+                                </p>
+                                
+                                {activeUsers.map(u => (
+                                    <div key={u.deviceId} className="flex flex-col sm:flex-row sm:items-center justify-between border border-chamber-white/10 p-3 bg-chamber-black/40 hover:bg-chamber-white/5 transition-colors gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="font-mono text-xs sm:text-sm text-gray-300 flex items-center gap-2">
+                                                <span className="hidden sm:inline">{u.deviceId}</span>
+                                                <span className="sm:hidden">{u.deviceId.substring(0, 10)}...</span>
+                                                <button onClick={() => handleCopy(u.deviceId, `copy-${u.deviceId}`)} className="text-gray-500 hover:text-chamber-gold transition-colors">
+                                                    {copiedId === `copy-${u.deviceId}` ? <Check size={12} className="text-chamber-glow" /> : <Copy size={12} />}
+                                                </button>
+                                                {u.deviceId === deviceId && <span className="text-chamber-gold text-[10px]">(Host)</span>}
+                                            </div>
                                                 <span className={`text-[9px] px-2 py-0.5 border uppercase tracking-widest ${
                                                     u.role === 'admin' ? 'border-chamber-gold text-chamber-gold bg-chamber-gold/10' : 
                                                     u.role === 'editor' ? 'border-green-500 text-green-500 bg-green-500/10' : 
@@ -399,7 +372,6 @@ const Room = () => {
                                         </>
                                     )}
                                 </div>
-                            )}
                         </motion.div>
                     </motion.div>
                 )}

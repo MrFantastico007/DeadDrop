@@ -4,25 +4,27 @@ const Permission = require('../models/Permission');
 let io;
 const activeUsers = new Map(); // socket.id -> { deviceId, ip }
 
-async function getRoleForDevice(deviceId) {
-    if (!deviceId) return 'viewer';
-    const perm = await Permission.findOne({ singleton: 'GLOBAL' }) || { admins: [], editors: [], conversers: [], blocked: [] };
+async function getRoleForDevice(deviceId, roomCode) {
+    if (!deviceId || !roomCode) return 'viewer';
+    const perm = await Permission.findOne({ roomCode }) || { admin: null, editors: [], conversers: [], blocked: [], viewers: [] };
     if (perm.blocked.includes(deviceId)) return 'blocked';
-    if (perm.admins.includes(deviceId)) return 'admin';
+    if (perm.admin === deviceId) return 'admin';
     if (perm.editors.includes(deviceId)) return 'editor';
     if (perm.conversers.includes(deviceId)) return 'converser';
     return 'viewer';
 }
 
-async function broadcastActiveUsers() {
-    if (!io) return;
+async function broadcastActiveUsers(roomCode) {
+    if (!io || !roomCode) return;
+    const usersInRoom = Array.from(activeUsers.values()).filter(u => u.roomCode === roomCode);
+    
     const usersWithRoles = await Promise.all(
-        Array.from(activeUsers.values()).map(async (user) => ({
+        usersInRoom.map(async (user) => ({
             ...user,
-            role: await getRoleForDevice(user.deviceId)
+            role: await getRoleForDevice(user.deviceId, roomCode)
         }))
     );
-    io.to('admin_channel').emit('active_users_update', usersWithRoles);
+    io.to(`admin_channel_${roomCode}`).emit('active_users_update', usersWithRoles);
 }
 
 module.exports = {
@@ -42,25 +44,25 @@ module.exports = {
         const deviceId = typeof data === 'object' ? data.deviceId : null;
 
         if (deviceId) {
-            const role = await getRoleForDevice(deviceId);
+            const role = await getRoleForDevice(deviceId, roomCode);
             if (role === 'blocked') {
                 socket.emit('access_denied', { reason: 'blocked' });
                 socket.disconnect(true);
                 return;
             }
-            activeUsers.set(socket.id, { deviceId, ip });
-            broadcastActiveUsers();
+            activeUsers.set(socket.id, { deviceId, ip, roomCode });
+            broadcastActiveUsers(roomCode);
         }
 
         socket.join(roomCode);
       });
 
-      socket.on('join_admin_channel', async (deviceId) => {
-        const role = await getRoleForDevice(deviceId);
+      socket.on('join_admin_channel', async ({ deviceId, roomCode }) => {
+        const role = await getRoleForDevice(deviceId, roomCode);
         if (role === 'admin') {
-            socket.join('admin_channel');
-            broadcastActiveUsers();
-            const perm = await Permission.findOne({ singleton: 'GLOBAL' }) || { blocked: [] };
+            socket.join(`admin_channel_${roomCode}`);
+            broadcastActiveUsers(roomCode);
+            const perm = await Permission.findOne({ roomCode }) || { blocked: [] };
             socket.emit('blocked_users_update', perm.blocked);
         }
       });
@@ -70,8 +72,11 @@ module.exports = {
       });
 
       socket.on('disconnect', () => {
-        activeUsers.delete(socket.id);
-        broadcastActiveUsers();
+        const user = activeUsers.get(socket.id);
+        if (user) {
+            activeUsers.delete(socket.id);
+            broadcastActiveUsers(user.roomCode);
+        }
       });
     });
 

@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Crosshair, ArrowRight, Upload, Zap, Github, Star, ShieldAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// Use environment variable for production, fallback to localhost for dev
+const ENDPOINT = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const getDeviceId = () => {
+    let storedId = localStorage.getItem('deaddrop_device_id');
+    if (!storedId) {
+        storedId = 'user-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        localStorage.setItem('deaddrop_device_id', storedId);
+    }
+    return storedId;
+};
+
 const Home = () => {
   const [roomCode, setRoomCode] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
 
   const handleJoin = (e) => {
@@ -14,9 +28,21 @@ const Home = () => {
     }
   };
 
-  const handleCreate = () => {
-    const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    navigate(`/room/${randomCode}`);
+  const handleCreate = async () => {
+    if (isCreating) return;
+    setIsCreating(true);
+    try {
+        const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const deviceId = getDeviceId();
+        await axios.post(`${ENDPOINT}/api/room/create`, { roomCode: randomCode, deviceId });
+        navigate(`/room/${randomCode}`);
+    } catch (err) {
+        console.error("Failed to create room", err);
+        setIsCreating(false);
+        // Fallback: still navigate if backend creation fails, though admin rights won't be applied
+        const fallbackCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        navigate(`/room/${fallbackCode}`);
+    }
   };
 
   return (

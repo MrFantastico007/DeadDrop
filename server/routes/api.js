@@ -6,22 +6,21 @@ const path = require('path');
 const Message = require('../models/Message');
 const Permission = require('../models/Permission');
 
-async function getPermissions() {
-    let perm = await Permission.findOne({ singleton: 'GLOBAL' });
+async function getPermissions(roomCode) {
+    let perm = await Permission.findOne({ roomCode });
     if (!perm) {
-        perm = await Permission.create({ singleton: 'GLOBAL' });
+        return { admin: null, editors: [], conversers: [], blocked: [], viewers: [] };
     }
     return perm;
 }
 
 function getRoleForDevice(perm, deviceId) {
-    if (!deviceId) return 'editor';
+    if (!deviceId) return 'viewer';
     if (perm.blocked.includes(deviceId)) return 'blocked';
-    if (perm.admins.includes(deviceId)) return 'admin';
-    if (perm.viewers.includes(deviceId)) return 'viewer';
-    if (perm.conversers.includes(deviceId)) return 'converser';
+    if (perm.admin === deviceId) return 'admin';
     if (perm.editors.includes(deviceId)) return 'editor';
-    return 'editor'; // Default to editor for new connections
+    if (perm.conversers.includes(deviceId)) return 'converser';
+    return 'viewer'; // Default to viewer for new connections
 }
 
 // Ensure uploads directory exists
@@ -48,13 +47,33 @@ const upload = multer({
     limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
 
+// Create a new room and assign creator as admin
+router.post('/room/create', async (req, res) => {
+    const { roomCode, deviceId } = req.body;
+    if (!roomCode || !deviceId) return res.status(400).json({ error: 'Missing data' });
+    
+    try {
+        let perm = await Permission.findOne({ roomCode });
+        if (!perm) {
+            perm = new Permission({
+                roomCode,
+                admin: deviceId
+            });
+            await perm.save();
+        }
+        res.json({ success: true, role: 'admin' });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to create room' });
+    }
+});
+
 // Join a room and fetch its history
 router.post('/room/join', async (req, res) => {
   const { roomCode, deviceId } = req.body;
   if (!roomCode) return res.status(400).json({ error: 'Room code is required' });
   
   try {
-    const perm = await getPermissions();
+    const perm = await getPermissions(roomCode);
     const role = getRoleForDevice(perm, deviceId);
     
     const messages = await Message.find({ roomCode }).sort({ createdAt: 1 });
@@ -93,7 +112,7 @@ router.post('/message', async (req, res) => {
     const { roomCode, type, content, fileUrl, publicId, deviceId } = req.body;
     
     try {
-        const perm = await getPermissions();
+        const perm = await getPermissions(roomCode);
         const role = getRoleForDevice(perm, deviceId);
         
         if (role === 'blocked') return res.status(403).json({ error: 'Blocked' });
@@ -119,18 +138,17 @@ router.post('/message', async (req, res) => {
 });
 
 // Delete a message and its associated file if applicable
-router.delete('/message/:id', async (req, res) => {
     try {
         const deviceId = req.headers.deviceid;
-        const perm = await getPermissions();
+        const message = await Message.findById(req.params.id);
+        if (!message) return res.status(404).json({ error: 'Message not found' });
+
+        const perm = await getPermissions(message.roomCode);
         const role = getRoleForDevice(perm, deviceId);
         
         if (role !== 'admin' && role !== 'editor') {
             return res.status(403).json({ error: 'Forbidden. You do not have Delete permissions.' });
         }
-
-        const message = await Message.findById(req.params.id);
-        if (!message) return res.status(404).json({ error: 'Message not found' });
 
         // If it's a file, remove it from local storage first
         if (message.type === 'file' && message.publicId) {
@@ -203,37 +221,19 @@ router.get('/cleanup', async (req, res) => {
 });
 
 // --- Admin Routes ---
-router.post('/admin/login', async (req, res) => {
-    const { adminCode, deviceId } = req.body;
-    if (!adminCode || !deviceId) return res.status(400).json({ error: 'Missing data' });
-    
-    if (adminCode === global.SERVER_ADMIN_CODE) {
-        const perm = await getPermissions();
-        if (!perm.admins.includes(deviceId)) {
-            perm.admins.push(deviceId);
-            // Remove from other roles if present
-            perm.editors = perm.editors.filter(id => id !== deviceId);
-            perm.blocked = perm.blocked.filter(id => id !== deviceId);
-            perm.viewers = perm.viewers.filter(id => id !== deviceId);
-            perm.conversers = perm.conversers.filter(id => id !== deviceId);
-            await perm.save();
-        }
-        res.json({ success: true, role: 'admin' });
-    } else {
-        res.status(401).json({ error: 'Invalid code' });
-    }
-});
-
 router.post('/admin/role', async (req, res) => {
-    const { targetId, action } = req.body; // action: 'editor', 'converser', 'block', 'reset'
+    const { roomCode, targetId, action } = req.body; // action: 'editor', 'converser', 'block', 'reset'
     const adminId = req.headers.deviceid;
-    const perm = await getPermissions();
     
-    if (!perm.admins.includes(adminId)) {
+    if (!roomCode || !targetId || !action) return res.status(400).json({ error: 'Missing data' });
+
+    const perm = await Permission.findOne({ roomCode });
+    
+    if (!perm || perm.admin !== adminId) {
         return res.status(403).json({ error: 'Unauthorized' });
     }
-    if (perm.admins.includes(targetId)) {
-        return res.status(400).json({ error: 'Cannot modify another admin' });
+    if (perm.admin === targetId) {
+        return res.status(400).json({ error: 'Cannot modify admin' });
     }
 
     // Clean current roles for target
@@ -251,12 +251,12 @@ router.post('/admin/role', async (req, res) => {
 
     const io = require('../utils/socket').getIO();
 
-    // If blocked, forcefully disconnect their active sockets
+    // If blocked, forcefully disconnect their active sockets in that room
     if (action === 'block') {
         const socketUtils = require('../utils/socket');
         const activeUsers = socketUtils.getActiveUsers();
         for (const [socketId, user] of activeUsers.entries()) {
-            if (user.deviceId === targetId) {
+            if (user.deviceId === targetId && user.roomCode === roomCode) {
                 const targetSocket = io.sockets.sockets.get(socketId);
                 if (targetSocket) {
                     targetSocket.emit('access_denied', { reason: 'blocked' });
@@ -267,17 +267,20 @@ router.post('/admin/role', async (req, res) => {
     }
 
     // Broadcast updates
-    require('../utils/socket').broadcastActiveUsers();
-    io.to('admin_channel').emit('blocked_users_update', perm.blocked);
-    io.emit('role_update', { targetId, action });
+    require('../utils/socket').broadcastActiveUsers(roomCode);
+    io.to(`admin_channel_${roomCode}`).emit('blocked_users_update', perm.blocked);
+    io.to(roomCode).emit('role_update', { targetId, action });
 
     res.json({ success: true });
 });
 
 router.get('/admin/blocked', async (req, res) => {
     const adminId = req.headers.deviceid;
-    const perm = await getPermissions();
-    if (!perm.admins.includes(adminId)) {
+    const roomCode = req.query.roomCode;
+    if (!roomCode) return res.status(400).json({ error: 'Missing roomCode' });
+
+    const perm = await Permission.findOne({ roomCode });
+    if (!perm || perm.admin !== adminId) {
         return res.status(403).json({ error: 'Unauthorized' });
     }
     res.json({ success: true, blocked: perm.blocked });
