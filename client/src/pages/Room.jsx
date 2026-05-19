@@ -449,7 +449,7 @@ const Room = () => {
                                 </div>
 
                                 {/* Content Display */}
-                                <div className="flex-1 min-w-0 pr-12">
+                                <div className="flex-1 min-w-0">
                                     {msg.type === 'text' ? (
                                         <div className="font-mono text-gray-300 text-sm whitespace-pre-wrap break-words leading-relaxed">
                                             {msg.content}
@@ -476,7 +476,7 @@ const Room = () => {
                                 </div>
 
                                 {/* Message Actions */}
-                                <div className="flex md:flex-col gap-2 md:absolute md:top-5 md:right-5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                <div className="flex md:flex-col gap-2 ml-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0">
                                     <button 
                                         onClick={() => handleCopy(msg.type === 'text' ? msg.content : msg.fileUrl, msg._id)}
                                         className="p-2 border border-chamber-white/20 text-gray-400 hover:text-chamber-gold hover:border-chamber-gold transition-colors bg-chamber-navy/50"
