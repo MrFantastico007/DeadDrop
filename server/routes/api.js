@@ -1,24 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const fs = require('fs');
+const path = require('path');
 const Message = require('../models/Message');
 
-// Cloudinary configuration for file storage
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Setup Multer to store uploaded files directly in Cloudinary
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'live-drop',
-    resource_type: 'auto', // Support all file types (images, pdfs, etc.)
+// Setup Multer to store uploaded files locally
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir)
   },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    // Create a safe filename
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, uniqueSuffix + '-' + safeName)
+  }
 });
 
 const upload = multer({ 
@@ -53,9 +56,12 @@ router.post('/upload', (req, res, next) => {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  // Return the Cloudinary URL so the client can broadcast it
+  // Return the local URL so the client can broadcast it
+  // Construct the full URL using the request host or fallback to standard path
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers.host;
   res.json({
-    fileUrl: req.file.path,
+    fileUrl: `${protocol}://${host}/uploads/${req.file.filename}`,
     publicId: req.file.filename
   });
 });
@@ -89,9 +95,12 @@ router.delete('/message/:id', async (req, res) => {
         const message = await Message.findById(req.params.id);
         if (!message) return res.status(404).json({ error: 'Message not found' });
 
-        // If it's a file, remove it from Cloudinary storage first
+        // If it's a file, remove it from local storage first
         if (message.type === 'file' && message.publicId) {
-            await cloudinary.uploader.destroy(message.publicId);
+            const filePath = path.join(__dirname, '../uploads', message.publicId);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
         }
 
         await Message.findByIdAndDelete(req.params.id);
@@ -125,15 +134,21 @@ router.get('/cleanup', async (req, res) => {
             return res.json({ success: true, deletedCount: 0, cloudinaryDeleted: 0, message: "No inactive rooms found" });
         }
 
-        // 3. Clean up Cloudinary assets for these messages
+        // 3. Clean up local files for these messages
         const fileMessages = messagesToDelete.filter(m => m.type === 'file' && m.publicId);
-        const publicIds = fileMessages.map(m => m.publicId);
+        let deletedFilesCount = 0;
         
-        if (publicIds.length > 0) {
-            // Cloudinary delete_resources accepts a maximum of 100/1000 public_ids per call
-            // Handling in chunks if necessary (simplified here)
-            await cloudinary.api.delete_resources(publicIds);
-        }
+        fileMessages.forEach(m => {
+            const filePath = path.join(__dirname, '../uploads', m.publicId);
+            if (fs.existsSync(filePath)) {
+                try {
+                    fs.unlinkSync(filePath);
+                    deletedFilesCount++;
+                } catch (err) {
+                    console.error("Failed to delete local file:", filePath, err);
+                }
+            }
+        });
         
         // 4. Delete the messages from Database
         const deleteResult = await Message.deleteMany({ _id: { $in: messagesToDelete.map(m => m._id) } });
@@ -141,7 +156,7 @@ router.get('/cleanup', async (req, res) => {
         res.json({ 
             success: true, 
             deletedCount: deleteResult.deletedCount, 
-            cloudinaryDeleted: publicIds.length,
+            filesDeleted: deletedFilesCount,
             inactiveRoomsCleaned: messagesToDelete.length
         });
     } catch (err) {

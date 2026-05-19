@@ -17,6 +17,10 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
+// Serve uploaded files statically
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Connect to MongoDB
 console.log("Connecting to database...");
 mongoose.connect(process.env.MONGO_URI)
