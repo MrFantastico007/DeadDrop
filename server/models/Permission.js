@@ -22,6 +22,10 @@ const permissionSchema = new mongoose.Schema({
   blocked: {
     type: [String],
     default: []
+  },
+  viewers: {
+    type: [String],
+    default: []
   }
 });
 

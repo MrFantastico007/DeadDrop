@@ -15,12 +15,13 @@ async function getPermissions() {
 }
 
 function getRoleForDevice(perm, deviceId) {
-    if (!deviceId) return 'viewer';
+    if (!deviceId) return 'editor';
     if (perm.blocked.includes(deviceId)) return 'blocked';
     if (perm.admins.includes(deviceId)) return 'admin';
-    if (perm.editors.includes(deviceId)) return 'editor';
+    if (perm.viewers.includes(deviceId)) return 'viewer';
     if (perm.conversers.includes(deviceId)) return 'converser';
-    return 'viewer';
+    if (perm.editors.includes(deviceId)) return 'editor';
+    return 'editor'; // Default to editor for new connections
 }
 
 // Ensure uploads directory exists
@@ -213,6 +214,8 @@ router.post('/admin/login', async (req, res) => {
             // Remove from other roles if present
             perm.editors = perm.editors.filter(id => id !== deviceId);
             perm.blocked = perm.blocked.filter(id => id !== deviceId);
+            perm.viewers = perm.viewers.filter(id => id !== deviceId);
+            perm.conversers = perm.conversers.filter(id => id !== deviceId);
             await perm.save();
         }
         res.json({ success: true, role: 'admin' });
@@ -237,10 +240,12 @@ router.post('/admin/role', async (req, res) => {
     perm.editors = perm.editors.filter(id => id !== targetId);
     perm.conversers = perm.conversers.filter(id => id !== targetId);
     perm.blocked = perm.blocked.filter(id => id !== targetId);
+    perm.viewers = perm.viewers.filter(id => id !== targetId);
 
     if (action === 'editor') perm.editors.push(targetId);
     if (action === 'converser') perm.conversers.push(targetId);
     if (action === 'block') perm.blocked.push(targetId);
+    if (action === 'reset') perm.viewers.push(targetId);
     
     await perm.save();
 
