@@ -21,14 +21,20 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-chamber-black text-chamber-white font-body overflow-x-hidden relative flex flex-col">
-      {/* Background Image & Overlay */}
-      <div className="fixed inset-0 z-0">
-        <img 
-          src="/chamber1.jpeg" 
-          alt="Chamber Background" 
-          className="w-full h-full object-cover opacity-30 object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/80 via-chamber-black/60 to-chamber-black/95 mix-blend-multiply"></div>
+      {/* Tactical Animated Background */}
+      <div className="fixed inset-0 z-0 bg-chamber-black overflow-hidden">
+        <div className="absolute inset-0 bg-tactical-grid opacity-20"></div>
+        
+        {/* Animated Laser/Tracer Lines */}
+        <div className="absolute top-1/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-chamber-gold to-transparent opacity-50 animate-trace-x"></div>
+        <div className="absolute top-2/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-chamber-glow to-transparent opacity-30 animate-trace-x-delayed"></div>
+        <div className="absolute left-1/4 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-chamber-gold to-transparent opacity-40 animate-trace-y"></div>
+        <div className="absolute right-1/3 top-0 w-[1px] h-full bg-gradient-to-b from-transparent via-chamber-glow to-transparent opacity-30 animate-trace-y-delayed"></div>
+        
+        {/* Central TP Anchor Pulse */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-chamber-gold/10 rounded-full animate-tp-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-chamber-gold/5 rounded-full animate-tp-pulse" style={{ animationDelay: '1s' }}></div>
+        
         {/* Tactical Scanning Lines */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-20 mix-blend-overlay"></div>
       </div>

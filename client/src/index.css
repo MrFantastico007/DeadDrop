@@ -13,6 +13,11 @@
   
   --animate-pulse-glow: pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-scan: scan 8s linear infinite;
+  --animate-trace-x: traceX 3s cubic-bezier(0.8, 0, 0.2, 1) infinite;
+  --animate-trace-x-delayed: traceX 4s cubic-bezier(0.8, 0, 0.2, 1) infinite 1.5s;
+  --animate-trace-y: traceY 5s cubic-bezier(0.8, 0, 0.2, 1) infinite 0.5s;
+  --animate-trace-y-delayed: traceY 6s cubic-bezier(0.8, 0, 0.2, 1) infinite 2s;
+  --animate-tp-pulse: tpPulse 3s ease-out infinite;
 
   @keyframes pulseGlow {
     0%, 100% { box-shadow: 0 0 5px 0px rgba(212, 175, 55, 0.2); }
@@ -22,6 +27,21 @@
   @keyframes scan {
     0% { background-position: 0% -100%; }
     100% { background-position: 0% 200%; }
+  }
+
+  @keyframes traceX {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes traceY {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  @keyframes tpPulse {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-color: rgba(212, 175, 55, 0.8); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; border-color: rgba(212, 175, 55, 0); }
   }
 }
 
