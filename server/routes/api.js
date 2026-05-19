@@ -39,8 +39,16 @@ router.post('/room/join', async (req, res) => {
   }
 });
 
-// Handle file uploads
-router.post('/upload', upload.single('file'), async (req, res) => {
+// Handle file uploads with proper error catching
+router.post('/upload', (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      console.error("Multer error:", err);
+      return res.status(400).json({ error: err.message || 'File upload failed' });
+    }
+    next();
+  });
+}, async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }

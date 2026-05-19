@@ -113,7 +113,7 @@ const Room = () => {
                 type: 'file',
                 fileUrl: uploadRes.data.fileUrl,
                 publicId: uploadRes.data.publicId,
-                content: file.name
+                content: newMessage.trim() ? newMessage.trim() : file.name
             };
 
             await axios.post(`${ENDPOINT}/api/message`, messageData);
