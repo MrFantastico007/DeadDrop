@@ -247,8 +247,8 @@ const Room = () => {
             <div className="absolute inset-0 z-0 bg-chamber-black overflow-hidden pointer-events-none">
                 <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/90 via-chamber-black/60 to-chamber-black/90"></div>
                 
-                {/* Cinematic Gold Ambient Lighting */}
-                <div className="absolute inset-0 chamber-ambient"></div>
+                {/* High-Tech Glowing Dot Matrix */}
+                <div className="absolute inset-[-50%] chamber-dot-matrix opacity-20 pointer-events-none"></div>
                 
                 {/* Tactical Grid Overlay */}
                 <div className="absolute inset-0 bg-tactical-grid opacity-10"></div>

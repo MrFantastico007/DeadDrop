@@ -32,8 +32,8 @@ const Home = () => {
         {/* Darkening Gradient for Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-chamber-black/95 via-chamber-black/60 to-chamber-black/95"></div>
 
-        {/* Cinematic Gold Ambient Lighting */}
-        <div className="absolute inset-0 chamber-ambient"></div>
+        {/* High-Tech Glowing Dot Matrix */}
+        <div className="absolute inset-[-50%] chamber-dot-matrix opacity-30 pointer-events-none"></div>
         
         {/* Tactical Grid Overlay */}
         <div className="absolute inset-0 bg-tactical-grid opacity-10"></div>
@@ -125,6 +125,7 @@ const Home = () => {
               >
                 <span>Initialize</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                <div className="tactical-btn-flare"></div>
               </button>
             </form>
           </motion.div>
@@ -166,6 +167,7 @@ const Home = () => {
             >
               <span>Deploy System</span>
               <Upload size={18} className="group-hover:-translate-y-1 transition-transform" />
+              <div className="tactical-btn-flare"></div>
             </button>
           </motion.div>
 
